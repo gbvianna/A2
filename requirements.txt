@@ -1,1 +1,3 @@
 requests
+streamlit as st
+matplotlib.pyplot as plt
