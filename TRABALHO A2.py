@@ -1,5 +1,7 @@
-import streamlit as st
+from re import findall
+import requests
 from bs4 import BeautifulSoup
+import matplotlib.pyplot as plt
 from collections import Counter
 
 def fazer_requisicao(url):
@@ -8,12 +10,12 @@ def fazer_requisicao(url):
         response.raise_for_status()
         return response.content
     except requests.exceptions.RequestException as e:
-        st.error("Ocorreu um erro durante a requisição:", e)
+        print("Ocorreu um erro durante a requisição:", e)
         return None
 
 def extrair_dados(html):
     soup = BeautifulSoup(html, 'html.parser')
-    manchetes = soup.find_all('a', class_='cd__headline-link')
+    manchetes = soup.find_all('div', attrs={'class': 'container__headline'})
 
     palavras = []
     for manchete in manchetes:
@@ -22,54 +24,43 @@ def extrair_dados(html):
         palavras.extend(palavras_chave)
 
     return palavras
+url = 'https://edition.cnn.com/'
 
-def main():
-    st.title("Análise de Manchetes")
-    url = st.text_input("Digite a URL do site para análise")
+conteudo_html = fazer_requisicao(url)
+if conteudo_html:
+    dados_coletados = extrair_dados(conteudo_html)
 
-    if st.button("Coletar Dados"):
-        conteudo_html = fazer_requisicao(url)
-        if conteudo_html:
-            dados_coletados = extrair_dados(conteudo_html)
+    opcao = input("Escolha uma opção:\n1 - Processar palavras mais frequentes\n2 - Contar ocorrência de uma palavra específica\n3 - Visualizar todas as palavras coletadas\n")
 
-            opcao = st.selectbox("Escolha uma opção:", ["Processar palavras mais frequentes", "Contar ocorrência de uma palavra específica", "Visualizar todas as palavras coletadas"])
-
-            if opcao == "Processar palavras mais frequentes":
-                if dados_coletados:
-                    contagem_palavras = Counter(dados_coletados)
-                    palavras_comuns = contagem_palavras.most_common(10)
-                    if palavras_comuns:
-                        x, y = zip(*palavras_comuns)
-                        fig, ax = plt.subplots()
-                        ax.bar(x, y)
-                        ax.set_xlabel('Palavras')
-                        ax.set_ylabel('Contagem')
-                        ax.set_title('Contagem de Palavras mais Frequentes nas Manchetes')
-                        plt.xticks(rotation=45)
-                        st.pyplot(fig)
-                    else:
-                        st.warning("Não foram encontradas palavras mais frequentes para processar.")
-                else:
-                    st.warning("Não foram encontradas palavras para processar.")
-
-            elif opcao == "Contar ocorrência de uma palavra específica":
-                if dados_coletados:
-                    palavra = st.text_input("Digite uma palavra para contar sua ocorrência:")
-                    ocorrencias = dados_coletados.count(palavra)
-                    st.write(f"A palavra '{palavra}' ocorreu {ocorrencias} vezes nas manchetes.")
-                else:
-                    st.warning("Não foram encontradas palavras para contar ocorrências.")
-
-            elif opcao == "Visualizar todas as palavras coletadas":
-                if dados_coletados:
-                    st.write("Dados coletados:")
-                    for palavra in dados_coletados:
-                        st.write(palavra)
-                else:
-                    st.warning("Não foram encontradas palavras coletadas.")
-
+    if opcao == '1':
+        if dados_coletados:
+            contagem_palavras = Counter(dados_coletados)
+            palavras_comuns = contagem_palavras.most_common(10)
+            if palavras_comuns:
+                x, y = zip(*palavras_comuns)
+                plt.bar(x, y)
+                plt.xlabel('Palavras')
+                plt.ylabel('Contagem')
+                plt.title('Contagem de Palavras mais Frequentes nas Manchetes')
+                plt.xticks(rotation=45)
+                plt.show()
             else:
-                st.warning("Opção inválida.")
-
-if __name__ == '__main__':
-    main()
+                print("Não foram encontradas palavras mais frequentes para processar.")
+        else:
+            print("Não foram encontradas palavras para processar.")
+    elif opcao == '2':
+        if dados_coletados:
+            palavra = input("Digite uma palavra para contar sua ocorrência: ")
+            ocorrencias = dados_coletados.count(palavra)
+            print(f"A palavra '{palavra}' ocorreu {ocorrencias} vezes nas manchetes.")
+        else:
+            print("Não foram encontradas palavras para contar ocorrências.")
+    elif opcao == '3':
+        if dados_coletados:
+            print("Palavras coletadas:")
+            for palavra in dados_coletados:
+                print(palavra)
+        else:
+            print("Não foram encontradas palavras coletadas.")
+    else:
+        print("Opção inválida.")
