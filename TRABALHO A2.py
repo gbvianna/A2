@@ -1,5 +1,5 @@
+import streamlit as st
 from re import findall
-import requests
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 from collections import Counter
