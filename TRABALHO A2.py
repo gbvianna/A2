@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 from re import findall
 from bs4 import BeautifulSoup
