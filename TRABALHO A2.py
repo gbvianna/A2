@@ -11,7 +11,7 @@ def fazer_requisicao(url):
         response.raise_for_status()
         return response.content
     except requests.exceptions.RequestException as e:
-        print("Ocorreu um erro durante a requisição:", e)
+        st.error("Ocorreu um erro durante a requisição:", e)
         return None
 
 def extrair_dados(html):
@@ -25,15 +25,19 @@ def extrair_dados(html):
         palavras.extend(palavras_chave)
 
     return palavras
+
 url = 'https://edition.cnn.com/'
 
 conteudo_html = fazer_requisicao(url)
 if conteudo_html:
     dados_coletados = extrair_dados(conteudo_html)
 
-    opcao = input("Escolha uma opção:\n1 - Processar palavras mais frequentes\n2 - Contar ocorrência de uma palavra específica\n3 - Visualizar todas as palavras coletadas\n")
+    opcao = st.sidebar.selectbox("Escolha uma opção:",
+                                 ["Processar palavras mais frequentes",
+                                  "Contar ocorrência de uma palavra específica",
+                                  "Visualizar todas as palavras coletadas"])
 
-    if opcao == '1':
+    if opcao == "Processar palavras mais frequentes":
         if dados_coletados:
             contagem_palavras = Counter(dados_coletados)
             palavras_comuns = contagem_palavras.most_common(10)
@@ -44,24 +48,24 @@ if conteudo_html:
                 plt.ylabel('Contagem')
                 plt.title('Contagem de Palavras mais Frequentes nas Manchetes')
                 plt.xticks(rotation=45)
-                plt.show()
+                st.pyplot(plt)
             else:
-                print("Não foram encontradas palavras mais frequentes para processar.")
+                st.warning("Não foram encontradas palavras mais frequentes para processar.")
         else:
-            print("Não foram encontradas palavras para processar.")
-    elif opcao == '2':
+            st.warning("Não foram encontradas palavras para processar.")
+    elif opcao == "Contar ocorrência de uma palavra específica":
         if dados_coletados:
-            palavra = input("Digite uma palavra para contar sua ocorrência: ")
+            palavra = st.text_input("Digite uma palavra para contar sua ocorrência:")
             ocorrencias = dados_coletados.count(palavra)
-            print(f"A palavra '{palavra}' ocorreu {ocorrencias} vezes nas manchetes.")
+            st.write(f"A palavra '{palavra}' ocorreu {ocorrencias} vezes nas manchetes.")
         else:
-            print("Não foram encontradas palavras para contar ocorrências.")
-    elif opcao == '3':
+            st.warning("Não foram encontradas palavras para contar ocorrências.")
+    elif opcao == "Visualizar todas as palavras coletadas":
         if dados_coletados:
-            print("Palavras coletadas:")
+            st.write("Palavras coletadas:")
             for palavra in dados_coletados:
-                print(palavra)
+                st.write(palavra)
         else:
-            print("Não foram encontradas palavras coletadas.")
+            st.warning("Não foram encontradas palavras coletadas.")
     else:
-        print("Opção inválida.")
+        st.error("Opção inválida.")
