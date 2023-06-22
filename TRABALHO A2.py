@@ -11,7 +11,7 @@ def fazer_requisicao(url):
         response.raise_for_status()
         return response.content
     except requests.exceptions.RequestException as e:
-        st.error("Ocorreu um erro durante a requisição:", e)
+        st.error("Ocorreu um erro durante a requisição: " + str(e))
         return None
 
 def extrair_dados(html):
@@ -32,10 +32,7 @@ conteudo_html = fazer_requisicao(url)
 if conteudo_html:
     dados_coletados = extrair_dados(conteudo_html)
 
-    opcao = st.sidebar.selectbox("Escolha uma opção:",
-                                 ["Processar palavras mais frequentes",
-                                  "Contar ocorrência de uma palavra específica",
-                                  "Visualizar todas as palavras coletadas"])
+    opcao = st.selectbox("Escolha uma opção:", ("Processar palavras mais frequentes", "Contar ocorrência de uma palavra específica", "Visualizar todas as palavras coletadas"))
 
     if opcao == "Processar palavras mais frequentes":
         if dados_coletados:
@@ -48,7 +45,7 @@ if conteudo_html:
                 plt.ylabel('Contagem')
                 plt.title('Contagem de Palavras mais Frequentes nas Manchetes')
                 plt.xticks(rotation=45)
-                st.pyplot(plt)
+                st.pyplot()
             else:
                 st.warning("Não foram encontradas palavras mais frequentes para processar.")
         else:
@@ -67,5 +64,3 @@ if conteudo_html:
                 st.write(palavra)
         else:
             st.warning("Não foram encontradas palavras coletadas.")
-    else:
-        st.error("Opção inválida.")
