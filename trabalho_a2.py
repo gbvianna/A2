@@ -3,8 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 from collections import Counter
 import matplotlib.pyplot as plt
-import nltk
-nltk.download('stopwords')
 
 def fazer_requisicao(url):
     try:
@@ -27,10 +25,12 @@ def extrair_dados(html):
 
     return palavras
 
-def exibir_palavras_frequentes(palavras, limite=10):
-    stopwords = nltk.corpus.stopwords.words('english')
+def is_stopword(palavra):
+    stopwords = ['the', 'and', 'is', 'a', 'of', 'in', 'to', 'that', 'it', 'for', 'on', 'with', 'as', 'at', 'this', 'by', 'from', 'an', 'be', 'or', 'you', 'are', 'we', 'can', 'your', 'more', 'if', 'but', 'not', 'all', 'my', 'will', 'they', 'has', 'their']  # Add more stopwords as needed
+    return palavra.lower() in stopwords
 
-    palavras_filtradas = [palavra for palavra in palavras if palavra.lower() not in stopwords]
+def exibir_palavras_frequentes(palavras, limite=10):
+    palavras_filtradas = [palavra for palavra in palavras if not is_stopword(palavra)]
 
     contagem_palavras = Counter(palavras_filtradas)
     palavras_frequentes = contagem_palavras.most_common(limite)
@@ -58,14 +58,4 @@ url = 'https://edition.cnn.com/'
 
 conteudo_html = fazer_requisicao(url)
 if conteudo_html:
-    dados_coletados = extrair_dados(conteudo_html)
-
-    if dados_coletados:
-        opcao = st.selectbox("Escolha uma opção:", ("Processar palavras mais frequentes", "Exibir todas as palavras coletadas"))
-
-        if opcao == "Processar palavras mais frequentes":
-            exibir_palavras_frequentes(dados_coletados)
-        elif opcao == "Exibir todas as palavras coletadas":
-            exibir_todas_palavras(dados_coletados)
-    else:
-        st.warning("Não foram encontradas palavras para processar.")
+    dados_coletados
