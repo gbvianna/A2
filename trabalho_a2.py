@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 from collections import Counter
+import matplotlib.pyplot as plt
 
 def fazer_requisicao(url):
     try:
@@ -28,6 +29,14 @@ def exibir_palavras_frequentes(palavras, limite=10):
     contagem_palavras = Counter(palavras)
     palavras_frequentes = contagem_palavras.most_common(limite)
     if palavras_frequentes:
+        x, y = zip(*palavras_frequentes)
+        fig, ax = plt.subplots()
+        ax.bar(x, y)
+        plt.xlabel('Palavras')
+        plt.ylabel('Contagem')
+        plt.title('Contagem de Palavras mais Frequentes nas Manchetes')
+        plt.xticks(rotation=45)
+        st.pyplot(fig)
         st.write("Palavras mais frequentes:")
         for palavra, ocorrencias in palavras_frequentes:
             st.write(f"'{palavra}': {ocorrencias} ocorrências")
