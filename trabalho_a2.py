@@ -3,6 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 from collections import Counter
 import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import nltk
+nltk.download('stopwords')
 
 def fazer_requisicao(url):
     try:
@@ -26,7 +29,12 @@ def extrair_dados(html):
     return palavras
 
 def exibir_palavras_frequentes(palavras, limite=10):
-    contagem_palavras = Counter(palavras)
+    stop_words = set(stopwords.words('english'))
+
+    # Filtrar palavras comuns
+    palavras_filtradas = [palavra for palavra in palavras if palavra.lower() not in stop_words]
+
+    contagem_palavras = Counter(palavras_filtradas)
     palavras_frequentes = contagem_palavras.most_common(limite)
     if palavras_frequentes:
         x, y = zip(*palavras_frequentes)
