@@ -1,6 +1,7 @@
 import requests
 import streamlit as st
 from re import findall
+import pandas as pd
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 from collections import Counter
