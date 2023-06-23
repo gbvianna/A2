@@ -1,10 +1,8 @@
-import requests
 import streamlit as st
-from re import findall
-import pandas as pd
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 from collections import Counter
+import requests
 
 def fazer_requisicao(url):
     try:
@@ -27,41 +25,42 @@ def extrair_dados(html):
 
     return palavras
 
-url = 'https://edition.cnn.com/'
+if __name__ == '__main__':
+    url = 'https://edition.cnn.com/'
 
-conteudo_html = fazer_requisicao(url)
-if conteudo_html:
-    dados_coletados = extrair_dados(conteudo_html)
+    conteudo_html = fazer_requisicao(url)
+    if conteudo_html:
+        dados_coletados = extrair_dados(conteudo_html)
 
-    opcao = st.selectbox("Escolha uma opção:", ("Processar palavras mais frequentes", "Contar ocorrência de uma palavra específica", "Visualizar todas as palavras coletadas"))
+        opcao = st.selectbox("Escolha uma opção:", ("Processar palavras mais frequentes", "Contar ocorrência de uma palavra específica", "Visualizar todas as palavras coletadas"))
 
-    if opcao == "Processar palavras mais frequentes":
-        if dados_coletados:
-            contagem_palavras = Counter(dados_coletados)
-            palavras_comuns = contagem_palavras.most_common(10)
-            if palavras_comuns:
-                x, y = zip(*palavras_comuns)
-                plt.bar(x, y)
-                plt.xlabel('Palavras')
-                plt.ylabel('Contagem')
-                plt.title('Contagem de Palavras mais Frequentes nas Manchetes')
-                plt.xticks(rotation=45)
-                st.pyplot()
+        if opcao == "Processar palavras mais frequentes":
+            if dados_coletados:
+                contagem_palavras = Counter(dados_coletados)
+                palavras_comuns = contagem_palavras.most_common(10)
+                if palavras_comuns:
+                    x, y = zip(*palavras_comuns)
+                    plt.bar(x, y)
+                    plt.xlabel('Palavras')
+                    plt.ylabel('Contagem')
+                    plt.title('Contagem de Palavras mais Frequentes nas Manchetes')
+                    plt.xticks(rotation=45)
+                    st.pyplot(plt)
+                else:
+                    st.warning("Não foram encontradas palavras mais frequentes para processar.")
             else:
-                st.warning("Não foram encontradas palavras mais frequentes para processar.")
-        else:
-            st.warning("Não foram encontradas palavras para processar.")
-    elif opcao == "Contar ocorrência de uma palavra específica":
-        if dados_coletados:
-            palavra = st.text_input("Digite uma palavra para contar sua ocorrência:")
-            ocorrencias = dados_coletados.count(palavra)
-            st.write(f"A palavra '{palavra}' ocorreu {ocorrencias} vezes nas manchetes.")
-        else:
-            st.warning("Não foram encontradas palavras para contar ocorrências.")
-    elif opcao == "Visualizar todas as palavras coletadas":
-        if dados_coletados:
-            st.write("Palavras coletadas:")
-            for palavra in dados_coletados:
-                st.write(palavra)
-        else:
-            st.warning("Não foram encontradas palavras coletadas.")
+                st.warning("Não foram encontradas palavras para processar.")
+        elif opcao == "Contar ocorrência de uma palavra específica":
+            if dados_coletados:
+                palavra = st.text_input("Digite uma palavra para contar sua ocorrência:")
+                ocorrencias = dados_coletados.count(palavra)
+                st.write(f"A palavra '{palavra}' ocorreu {ocorrencias} vezes nas manchetes.")
+            else:
+                st.warning("Não foram encontradas palavras para contar ocorrências.")
+        elif opcao == "Visualizar todas as palavras coletadas":
+            if dados_coletados:
+                st.write("Palavras coletadas:")
+                for palavra in dados_coletados:
+                    st.write(palavra)
+            else:
+                st.warning("Não foram encontradas palavras coletadas.")
