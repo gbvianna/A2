@@ -1,5 +1,5 @@
 
-pandas
+counter
 beautifulsoup4
 matplotlib
 requests
